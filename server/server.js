@@ -3,6 +3,7 @@ import "dotenv/config";
 import cors from "cors";
 import connectDB from "./config/db.js";
 import { clerkMiddleware } from '@clerk/express'
+import clerkWebhooks from "./controllers/ClerkWebHooks.js";
 
 connectDB()
 
@@ -12,6 +13,9 @@ app.use(cors())  // Enable cross origin resource sharing
 // Middleware
 app.use(express.json())
 app.use(clerkMiddleware())
+
+//API Listen to Clerk Webhooks
+app.use("/api/clerk",clerkWebhooks)
 
 app.get('/',(req,res)=>res.send("API is Working(Hotel Management)"))
 
