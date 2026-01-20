@@ -1,10 +1,11 @@
 import React, { useState } from 'react'
 import { assets, facilityIcons, roomsDummyData } from '../asset/assets'
-import { useNavigate } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
 import StarRating from '../components/StarRating'
+import { useAppContext } from '../context/AppContext.jsx'
 
 /* ================= CHECKBOX ================= */
-const CheckBox = ({ label, selected = false, onChange = () => {} }) => {
+const CheckBox = ({ label, selected = false, onChange = () => { } }) => {
   return (
     <label className="flex items-center gap-3 mt-2 text-sm text-gray-700 cursor-pointer">
       <input
@@ -19,7 +20,7 @@ const CheckBox = ({ label, selected = false, onChange = () => {} }) => {
 }
 
 /* ================= RADIO ================= */
-const RadioButton = ({ label, selected = false, onChange = () => {} }) => {
+const RadioButton = ({ label, selected = false, onChange = () => { } }) => {
   return (
     <label className="flex items-center gap-3 mt-2 text-sm text-gray-700 cursor-pointer">
       <input
@@ -35,8 +36,14 @@ const RadioButton = ({ label, selected = false, onChange = () => {} }) => {
 }
 
 const AllRooms = () => {
-  const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const { room, navigate, currency } = useAppContext()
   const [openFilters, setOpenFilters] = useState(false)
+  const [selectedFilters, setSelectedFilters] = useState({
+    roomType: [],
+    priceRange: [],
+  });
+  const [selectedSort, setSelectedSort] = useState('')
 
   // ================= FILTER STATES =================
   const [selectedRoomTypes, setSelectedRoomTypes] = useState([])
@@ -47,6 +54,29 @@ const AllRooms = () => {
   const roomTypes = ['Single Bed', 'Double Bed', 'Luxury Room', 'Family Suite']
   const priceRange = ['0 to 500', '500 to 1000', '1000 to 2000', '2000 to 3000']
   const sortOptions = ['Price Low to High', 'Price High to Low', 'Newest First']
+
+  // Handle changes for filters and sorting
+  const handleFilterChange = (checked, value, type) => {
+    setSelectedFilters((prevFilters) => {
+      const updatedFilters = { ...prevFilters };
+      if (checked) {
+        updatedFilters[type].push(value);
+      } else {
+        updatedFilters[type] = updatedFilters[type].filter(item => item !==
+          value);
+      } return updatedFilters;
+    })
+  }
+
+  const handleSortChange = (sortOption) => {
+    setSelectedSort(sortOption);
+  }
+
+  // Function to check if a room matches the selected room types
+  const matchesRoomType = (room) => {
+    return selectedFilters.roomType.length === 0 || selectedFilters.roomType.
+      includes(room.roomType);
+  }
 
   return (
     <div className="flex flex-col lg:flex-row gap-10 pt-28 md:pt-35 px-4 md:px-16 lg:px-24 xl:px-32">
@@ -201,4 +231,3 @@ const AllRooms = () => {
 
 export default AllRooms
 
- 
